@@ -8,7 +8,7 @@
         body {
             font-family: Arial, sans-serif;
             background: linear-gradient(rgba(162, 213, 224, 0.8), rgba(162, 213, 224, 0.8)), url('nature.jpg') no-repeat center center fixed;
-            background-size: cover; /* Ensures the background covers the entire area */
+            background-size: cover;
             margin: 0;
             padding: 0;
             text-align: center;
@@ -44,6 +44,7 @@
             width: 200px;
             height: 200px;
             border-radius: 30px;
+            cursor: pointer; /* Make images clickable */
         }
         .progress-bar-container {
             margin-top: 10px;
@@ -68,6 +69,10 @@
         .progress-bar.high {
             background-color: red;
         }
+        .result-message {
+            font-size: 24px;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -89,17 +94,20 @@
 
 <div class="images-container" id="imagesContainer">
     <div class="top-images" id="topImages">
-        <img id="image1" src="radiant.jpg" alt="radiant">
-        <img id="image2" src="shiny.jpg" alt="shiny">
+        <img id="image1" src="radiant.jpg" alt="radiant" onclick="checkAnswer(0)">
+        <img id="image2" src="shiny.jpg" alt="shiny" onclick="checkAnswer(1)">
     </div>
     <div class="bottom-image">
-        <img id="image3" src="glowing.jpg" alt="glowing">
+        <img id="image3" src="glowing.jpg" alt="glowing" onclick="checkAnswer(2)">
     </div>
 </div>
 
-<button class="button-text" id="flipButton">FLIP</button>
+<button class="button-text" id="flipButton" onclick="flipWord()">FLIP</button>
+<div id="resultMessage" class="result-message"></div>
 
 <script>
+
+    const answers = [0, 0, 2, 1, 0, 0];
     const words = [
         { word: "bright", images: ["https://th.bing.com/th/id/R.24e91dd4238654c1148c296af2521fd0?rik=WwqnD5%2fPOYE0gw&riu=http%3a%2f%2fwww.hdwallpapers.in%2fdownload%2fbright_day_light-1920x1200.jpg&ehk=QnQpWbE0XdX0NVss%2fUDZmZaDB%2fASkA8Mu0aYyfsjl4M%3d&risl=&pid=ImgRaw&r=0.jpg", "https://th.bing.com/th/id/R.82e70acb99668dc4bc0cfe01da48d1a9?rik=IrrxEVQzrkpexw&pid=ImgRaw&r=0.jpg", "https://th.bing.com/th/id/OIP.iL0YMa1V4qgwk92ZvGKMgQHaD4?rs=1&pid=ImgDetMain.jpg"] },
         { word: "dark", images: ["https://th.bing.com/th/id/OIP.r_SFi9Yqsq8NfrUYW0EXHAHaEo?rs=1&pid=ImgDetMain.jpg", "https://img.ixintu.com/upload/jpg/20210523/19a0ee8476c12f5101674192d5e4d405_130778_800_800.jpg!con", "https://th.bing.com/th/id/OIP.jx-ruON2eHWPD-ldne7o1gHaHc?rs=1&pid=ImgDetMain.jpg"] },
@@ -108,104 +116,89 @@
         { word: "sad", images: ["https://ts1.cn.mm.bing.net/th/id/R-C.d2f69839c64f8037dc65299dc5ac7698?rik=WBOE8SvsK83Z6w&riu=http%3a%2f%2fpic2.nipic.com%2f20090505%2f213291_102742054_2.jpg&ehk=L5k%2ftKboRbtfnNjSDgPPm5ImYpfvOIiMeGz%2b93auAhM%3d&risl=&pid=ImgRaw&r=0.jpg", "https://img95.699pic.com/photo/60029/6610.jpg_wh860.jpg", "https://tse4-mm.cn.bing.net/th/id/OIP-C.jD2dtwaQPqftsQP-ZQH_-wHaIm?rs=1&pid=ImgDetMain.jpg"] },
         { word: "strong", images: ["https://pic.52112.com/JPG-180515/180515_71/QCGBQaR1w4_small.jpg", "https://pic4.zhimg.com/v2-0d13072e30bc586e1b8f157b80e52c2d_1440w.jpg?source=172ae18b.jpg", "https://x0.ifengimg.com/res/2020/E550263E0BA49E9F14F855CA1C0070D504200FCE_size44_w750_h492.jpeg"] },
         { word: "calm", images: ["https://img95.699pic.com/photo/60055/5050.jpg_wh860.jpg", "https://tse1-mm.cn.bing.net/th/id/OIP-C.4tfpZv3oLLg6cCmwJ6za1wAAAA?rs=1&pid=ImgDetMain.jpg", "https://img95.699pic.com/photo/50059/7688.jpg_wh860.jpg"] },
-        { word: "kind", images: ["https://tse2-mm.cn.bing.net/th/id/OIP-C.n0jgNBx82DwXJtiB4BAJhQHaE8?rs=1&pid=ImgDetMain.jpg", "https://tse1-mm.cn.bing.net/th/id/OIP-C.co6PH82J-N0rkzQZHfUdggHaEf?rs=1&pid=ImgDetMain.jpg", "https://tse3-mm.cn.bing.net/th/id/OIP-C.x6r_daFDH8j0IOoXEGmTiQHaFj?rs=1&pid=ImgDetMain.jpg"] },
-        { word: "tired", images: ["https://ts1.cn.mm.bing.net/th/id/R-C.d1f789e6b138e741d8a4278a009f1604?rik=2EBw%2fdZUNCwcYg&riu=http%3a%2f%2fseopic.699pic.com%2fphoto%2f50114%2f0374.jpg_wh1200.jpg&ehk=iUy7xkLWGYHIFJ5voKwkdHlKOb4OSLpvB%2fkyRmuZoPA%3d&risl=&pid=ImgRaw&r=0.jpg", "https://ts1.cn.mm.bing.net/th/id/R-C.69222f84eb95dad6241bf00daac9675c?rik=8ehav1R1vu968g&riu=http%3a%2f%2fcxyz.cssc.net.cn%2fuploads%2fcms._document%2f20230218%2f478a38f31e65ec6ef3be4e91b2a4895a.jpg&ehk=F87bLZ%2fQ%2fqpuklnaIQhfkAaoDX1sx8%2bFZAYFWoJmW6M%3d&risl=&pid=ImgRaw&r=0.jpg", "https://photo-static-api.fotomore.com/creative/vcg/veer/612/veer-153109452.jpg.jpg"] },
-        { word: "cool", images: ["https://ts1.cn.mm.bing.net/th/id/R-C.a272f51474f384b1161c78b3d7ba5243?rik=RG5xVs8YGJ7sHw&riu=http%3a%2f%2fimg.ugainian.com%2f1231%2f5a16ccc949eae.jpg&ehk=EL71fAE8HwRL2P%2fgVQKz6kX%2fj3mUP5QjudiPVQbWy%2b0%3d&risl=&pid=ImgRaw&r=0.jpg", "https://ts1.cn.mm.bing.net/th/id/R-C.c9c0d5f09062373ee5c02ca807facdbf?rik=giubgCsrYeZUpA&riu=http%3a%2f%2fimg95.699pic.com%2fphoto%2f40030%2f7027.jpg_wh860.jpg&ehk=oH7r%2bkKBE5slPfGb2iTzXu5moGxTgyofmeggRazk8Ro%3d&risl=&pid=ImgRaw&r=0.jpg", "https://pic.52112.com/180227/180227_71/2v7kT5ApL5.jpg"] }
+        { word: "gentle", images: ["https://pic1.zhimg.com/v2-8e2d55c04c1be82529a77d079c5cc5a3_1440w.jpg", "https://pic1.zhimg.com/v2-b57c0a67df460fc5a6984d04b0ae77b8_1440w.jpg", "https://pic1.zhimg.com/v2-fbadd80f8e23de73d58b4a6cfe580c6d_1440w.jpg"] },
+        { word: "sturdy", images: ["https://tse1-mm.cn.bing.net/th/id/OIP-C.KzxVAB3xy2l-V0_GdJ-MrAHaJQ?rs=1&pid=ImgDetMain.jpg", "https://pic.52112.com/JPG-180515/180515_71/QCGBQaR1w4_small.jpg", "https://img.ixintu.com/upload/jpg/20210523/19a0ee8476c12f5101674192d5e4d405_130778_800_800.jpg!con"] },
+        { word: "brave", images: ["https://th.bing.com/th/id/OIP.Ey8iR9vlT2g7cpOhNYUlQAHaE8?rs=1&pid=ImgDetMain.jpg", "https://th.bing.com/th/id/OIP.Aib-9Q0rUkpsYmciwW3WpwHaHa?rs=1&pid=ImgDetMain.jpg", "https://tse1-mm.cn.bing.net/th/id/OIP-C.G1-1bo6fjfaJzq2s6t0FEgHaJQ?rs=1&pid=ImgDetMain.jpg"] }
     ];
 
-    let currentIndex = 0;
+    let currentWordIndex = 0;
+    let correctAnswers = 0;
 
-    function updateProgressBar(percentage) {
-        const progressBar = document.getElementById('progressBar');
-        progressBar.classList.remove('low', 'medium', 'high');
+    function checkAnswer(imageIndex) {
+    const correctAnswer = answers[currentWordIndex];  // Get the correct index for this word
+    if (imageIndex === correctAnswer) {
+        correctAnswers++;
+        updateProgress();
+        displayResultMessage('Correct!');
+        setTimeout(nextWord, 2000); // Move to next word after 2 seconds if the answer is correct
+    } else {
+        displayResultMessage('Incorrect. Try again!');
+        document.getElementById("flipButton").disabled = true; // Disable flip button if incorrect
+        // Don't proceed to next word, the user must try again
+    }
+}
 
-        if (percentage <= 33) {
-            progressBar.classList.add('low');
-        } else if (percentage <= 66) {
-            progressBar.classList.add('medium');
-        } else {
-            progressBar.classList.add('high');
-        }
 
-        progressBar.value = percentage;
+
+
+
+    function updateProgress() {
+        const progressPercentage = (correctAnswers / words.length) * 100;
+        document.getElementById("progressBar").value = progressPercentage;
+        document.getElementById("percentageDisplay").innerText = Math.round(progressPercentage) + '%';
     }
 
-    function updatePage() {
-        const currentWord = words[currentIndex];
-        const wordDisplay = document.getElementById('wordDisplay');
-        const imagesContainer = document.getElementById('imagesContainer');
-
-        const percentage = Math.round(((currentIndex + 1) / words.length) * 100);
-
-        if (percentage === 100) {
-            wordDisplay.textContent = "Excellent!";
-            imagesContainer.style.display = "none";
-            document.querySelector('.top-left').style.display = "none";
-            document.querySelector('.top-right').style.display = "none";
-            // Show next page button after "Excellent!"
-            const nextPageButton = document.createElement("button");
-            nextPageButton.textContent = "NEXT PAGE";
-            nextPageButton.className = "button-text";
-            nextPageButton.onclick = () => {
-                currentIndex = 0; // Reset to the first word of the new page
-                updateNewPage();
-            };
-            document.body.appendChild(nextPageButton);
-        } else {
-            wordDisplay.textContent = currentWord.word;
-
-            const topImages = document.getElementById('topImages');
-            const bottomImage = document.getElementById('image3');
-
-            topImages.children[0].src = currentWord.images[0];
-            topImages.children[1].src = currentWord.images[1];
-            bottomImage.src = currentWord.images[2];
-
-            updateProgressBar(percentage);
-            document.getElementById('percentageDisplay').textContent = percentage + '%';
-
-            imagesContainer.style.display = "flex";
-            document.querySelector('.top-left').style.display = "block";
-            document.querySelector('.top-right').style.display = "block";
-        }
+    function displayResultMessage(message) {
+        document.getElementById("resultMessage").innerText = message;
+        setTimeout(() => {
+            document.getElementById("resultMessage").innerText = '';
+            nextWord();
+        }, 2000);
     }
 
-    document.getElementById('flipButton').addEventListener('click', () => {
-        currentIndex = (currentIndex + 1) % words.length;
-        updatePage();
-    });
+    function nextWord() {
+    if (currentWordIndex < words.length - 1) {
+        currentWordIndex++;
+        document.getElementById("wordDisplay").innerText = words[currentWordIndex].word;
+        updateImages();
+        document.getElementById("flipButton").disabled = false;  // Enable flip button when moving to next word
+    } else {
+        document.getElementById("resultMessage").innerText = "Game Over!";
+    }
+}
+
+
+
+
+    function updateImages() {
+        const currentWord = words[currentWordIndex];
+        const imageElements = document.querySelectorAll('img');
+        for (let i = 0; i < currentWord.images.length; i++) {
+            imageElements[i].src = currentWord.images[i];
+        }
+    }
 
     function resetGame() {
-        currentIndex = 0;
-        updatePage();
-        document.getElementById('progressBar').value = 0;
-        document.getElementById('percentageDisplay').textContent = '0%';
+        correctAnswers = 0;
+        currentWordIndex = 0;
+        document.getElementById("progressBar").value = 0;
+        document.getElementById("percentageDisplay").innerText = '0%';
+        document.getElementById("wordDisplay").innerText = words[currentWordIndex].word;
+        updateImages();
     }
 
-    function updateNewPage() {
-        // New words and images for the second page
-        const newWords = [
-            { word: "large", images: ["huge.jpg", "vast.jpg", "enormous.jpg"] },
-            { word: "fast", images: ["quick.jpg", "swift.jpg", "rapid.jpg"] },
-            { word: "excited", images: ["enthusiastic.jpg", "eager.jpg", "animated.jpg"] },
-            { word: "angry", images: ["irate.jpg", "furious.jpg", "mad.jpg"] },
-            { word: "beautiful", images: ["gorgeous.jpg", "stunning.jpg", "lovely.jpg"] },
-            { word: "funny", images: ["hilarious.jpg", "amusing.jpg", "comical.jpg"] },
-            { word: "brave", images: ["courageous.jpg", "fearless.jpg", "valiant.jpg"] },
-            { word: "lazy", images: ["slothful.jpg", "indolent.jpg", "unmotivated.jpg"] },
-            { word: "smart", images: ["intelligent.jpg", "clever.jpg", "bright.jpg"] },
-            { word: "friendly", images: ["amiable.jpg", "sociable.jpg", "welcoming.jpg"] }
-        ];
-
-        // Update the global words array and reset the current index
-        currentIndex = 0;
-        words.length = 0; // Clear the original words
-        words.push(...newWords); // Add new words
-
-        updatePage();
+    function flipWord() {
+        const wordElement = document.getElementById("wordDisplay");
+        if (wordElement.innerText === words[currentWordIndex].word) {
+            wordElement.innerText = 'Flip to see word meaning';
+        } else {
+            wordElement.innerText = words[currentWordIndex].word;
+        }
     }
 
-    updatePage();
+    window.onload = function() {
+        updateImages();
+    };
 </script>
 
 </body>
